@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { 
   MapPin, 
   CloudRain, 
@@ -16,6 +17,7 @@ import heroImage from "@/assets/hero-farming.jpg";
 import dashboardImage from "@/assets/dashboard-preview.jpg";
 
 const Home = () => {
+  const { t } = useTranslation();
   const features = [
     {
       icon: CloudRain,
@@ -53,7 +55,7 @@ const Home = () => {
     {
       name: "Sarah Johnson",
       role: "Corn & Soy Farmer",
-      quote: "CropCompass helped me increase my profits by 23% last season by recommending the perfect crop rotation based on weather patterns.",
+      quote: "Rakshak helped me increase my profits by 23% last season by recommending the perfect crop rotation based on weather patterns.",
       rating: 5
     },
     {
@@ -109,7 +111,7 @@ const Home = () => {
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">How CropCompass Works</h2>
+            <h2 className="text-4xl font-bold text-foreground mb-4">How {t('app.name')} Works</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Three simple steps to transform your farming decisions with AI-powered insights
             </p>
@@ -243,7 +245,7 @@ const Home = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-foreground mb-4">Trusted by Farmers</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              See how CropCompass is helping farmers across the country increase their profits
+              See how {t('app.name')} is helping farmers across the country increase their profits
             </p>
           </div>
 
@@ -282,7 +284,7 @@ const Home = () => {
             Ready to Transform Your Farm?
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Join thousands of farmers who are already using CropCompass to make smarter decisions and increase their profits.
+            Join thousands of farmers who are already using {t('app.name')} to make smarter decisions and increase their profits.
           </p>
           <Link to="/weather">
             <Button variant="outline" size="lg" className="text-lg px-8 py-6 bg-white text-primary hover:bg-white/90">
