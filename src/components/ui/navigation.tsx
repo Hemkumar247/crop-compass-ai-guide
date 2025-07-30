@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { LanguageSelector } from "./language-selector";
+import { ModeToggle } from "./theme-switcher";
 
 const Navigation = () => {
   const location = useLocation();
@@ -39,6 +40,7 @@ const Navigation = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
             <LanguageSelector />
+            <ModeToggle />
             {isAuthenticated ? (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
