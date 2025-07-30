@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { auth } from "@/lib/firebase";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,7 +23,6 @@ interface AuthModalProps {
 }
 
 export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
-  const { login, register } = useAuth();
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -30,23 +33,24 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   });
 
   const [registerForm, setRegisterForm] = useState({
-    name: "",
     email: "",
-    phone: "",
     password: "",
-    preferred_language: "en",
   });
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-    
+
     try {
-      await login(loginForm);
+      await signInWithEmailAndPassword(
+        auth,
+        loginForm.email,
+        loginForm.password
+      );
       onClose();
-    } catch (err) {
-      setError("Invalid credentials");
+    } catch (err: any) {
+      setError(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -56,12 +60,16 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-    
+
     try {
-      await register(registerForm);
+      await createUserWithEmailAndPassword(
+        auth,
+        registerForm.email,
+        registerForm.password
+      );
       onClose();
-    } catch (err) {
-      setError("Registration failed");
+    } catch (err: any) {
+      setError(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +79,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Welcome to {t('app.name')}</DialogTitle>
+          <DialogTitle>Welcome to {t("app.name")}</DialogTitle>
           <DialogDescription>
             Sign in to your account or create a new one to get started.
           </DialogDescription>
@@ -91,7 +99,9 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                   id="email"
                   type="email"
                   value={loginForm.email}
-                  onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
+                  onChange={(e) =>
+                    setLoginForm({ ...loginForm, email: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -101,7 +111,9 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                   id="password"
                   type="password"
                   value={loginForm.password}
-                  onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                  onChange={(e) =>
+                    setLoginForm({ ...loginForm, password: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -115,30 +127,15 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           <TabsContent value="register">
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  value={registerForm.name}
-                  onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
                 <Label htmlFor="register-email">Email</Label>
                 <Input
                   id="register-email"
                   type="email"
                   value={registerForm.email}
-                  onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
+                  onChange={(e) =>
+                    setRegisterForm({ ...registerForm, email: e.target.value })
+                  }
                   required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone (Optional)</Label>
-                <Input
-                  id="phone"
-                  value={registerForm.phone}
-                  onChange={(e) => setRegisterForm({ ...registerForm, phone: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
@@ -147,7 +144,12 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                   id="register-password"
                   type="password"
                   value={registerForm.password}
-                  onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
+                  onChange={(e) =>
+                    setRegisterForm({
+                      ...registerForm,
+                      password: e.target.value,
+                    })
+                  }
                   required
                 />
               </div>

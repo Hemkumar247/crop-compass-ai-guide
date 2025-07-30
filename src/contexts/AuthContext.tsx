@@ -1,13 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { User as FirebaseUser, onAuthStateChanged } from "firebase/auth";
+import { auth } from '@/lib/firebase';
 import { User } from '@/types/database';
-import { userAPI } from '@/api/services';
 
 interface AuthContextType {
-  user: User | null;
+  user: (User & FirebaseUser) | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (credentials: { email?: string; phone?: string; password: string }) => Promise<void>;
-  register: (userData: Partial<User> & { password: string }) => Promise<void>;
   logout: () => void;
 }
 
@@ -22,52 +21,32 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<(User & FirebaseUser) | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      loadUser();
-    } else {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        // Here you would typically fetch your own user data from your database
+        // For now, we'll just use the firebaseUser object
+        setUser(firebaseUser as User & FirebaseUser);
+      } else {
+        setUser(null);
+      }
       setIsLoading(false);
-    }
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const loadUser = async () => {
-    try {
-      const userData = await userAPI.getProfile();
-      setUser(userData);
-    } catch (error) {
-      localStorage.removeItem('auth_token');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const login = async (credentials: { email?: string; phone?: string; password: string }) => {
-    const response = await userAPI.login(credentials);
-    localStorage.setItem('auth_token', response.token);
-    setUser(response.user);
-  };
-
-  const register = async (userData: Partial<User> & { password: string }) => {
-    const response = await userAPI.register(userData);
-    localStorage.setItem('auth_token', response.token);
-    setUser(response.user);
-  };
-
   const logout = () => {
-    localStorage.removeItem('auth_token');
-    setUser(null);
+    return auth.signOut();
   };
 
   const value = {
     user,
     isAuthenticated: !!user,
     isLoading,
-    login,
-    register,
     logout,
   };
 
